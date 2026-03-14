@@ -75,3 +75,4 @@ def delete_flight(flight_id: str) -> bool:
 
 def list_flights() -> list[FlightWatch]:
     return load_watchlist()
+
