@@ -8,7 +8,7 @@ interface BookNowButtonProps {
 
 export default function BookNowButton({ url }: BookNowButtonProps) {
   const baseClasses =
-    "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all";
+    "inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-medium transition-all whitespace-nowrap";
 
   if (!url) {
     return (

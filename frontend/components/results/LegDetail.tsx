@@ -5,14 +5,44 @@ import type { FlightLeg } from "@/lib/types";
 
 interface LegDetailProps {
   leg: FlightLeg;
+  compact?: boolean;
 }
 
-export default function LegDetail({ leg }: LegDetailProps) {
+export default function LegDetail({ leg, compact = false }: LegDetailProps) {
   const stopsLabel = leg.stops ?? "Nonstop";
   const isNonstop =
     !leg.stops ||
     leg.stops === "0" ||
     leg.stops.toLowerCase().includes("nonstop");
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2 text-xs">
+        <span className="text-white/60 truncate max-w-[5rem]">
+          {leg.airline ?? "Unknown"}
+        </span>
+        <span className="text-white/80 tabular-nums">
+          {leg.departure_time ?? "--:--"}
+        </span>
+        <span className="text-white/30">→</span>
+        <span className="text-white/80 tabular-nums">
+          {leg.arrival_time ?? "--:--"}
+        </span>
+        {leg.duration && (
+          <span className="text-white/40">{leg.duration}</span>
+        )}
+        <span
+          className={`rounded-full px-1.5 py-px text-[9px] font-medium ${
+            isNonstop
+              ? "bg-green-500/10 text-green-400"
+              : "bg-amber-500/10 text-amber-400"
+          }`}
+        >
+          {stopsLabel}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-3 text-sm">

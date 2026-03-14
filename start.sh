@@ -17,7 +17,7 @@ trap cleanup EXIT INT TERM
 # Backend (using venv)
 echo "Starting backend on :8000..."
 cd "$DIR/backend"
-"$DIR/backend/env/bin/uvicorn" main:app --reload --host 127.0.0.1 --port 8000 &
+"$DIR/backend/env/bin/uvicorn" main:app --reload --host 0.0.0.0 --port 8000 &
 BACKEND_PID=$!
 
 # Frontend

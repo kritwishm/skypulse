@@ -10,8 +10,8 @@ import FlightCardExpanded from "@/components/dashboard/FlightCardExpanded";
 import EmptyState from "@/components/dashboard/EmptyState";
 import AddFlightModal from "@/components/forms/AddFlightModal";
 import DealAlert from "@/components/alerts/DealAlert";
+import MobileFAB from "@/components/dashboard/MobileFAB";
 import { useFlights, useCreateFlight, useUpdateFlight, useDeleteFlight } from "@/hooks/useFlights";
-import { usePriceHistory } from "@/hooks/usePriceHistory";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useDealAlert } from "@/hooks/useDealAlert";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
@@ -78,8 +78,6 @@ export default function Home() {
 
   const { isConnected, sendMessage } = useWebSocket({ onMessage });
 
-  const { history: expandedHistory } = usePriceHistory(expandedFlightId);
-  const [historyCache, setHistoryCache] = useState<Record<string, { id: number; flight_id: string; cheapest: number; low: number | null; high: number | null; result_count: number; checked_at: string }[]>>({});
 
   const handleCheckAll = useCallback(() => {
     if (!flights?.length) return;
@@ -101,11 +99,18 @@ export default function Home() {
       if (editingFlight) {
         updateFlightMutation.mutate(
           { id: editingFlight.id, data },
-          { onSuccess: () => { setIsAddModalOpen(false); setEditingFlight(null); } }
+          { onSuccess: () => {
+            setIsAddModalOpen(false);
+            setEditingFlight(null);
+            handleCheckOne(editingFlight.id);
+          } }
         );
       } else {
         createFlight.mutate(data, {
-          onSuccess: () => setIsAddModalOpen(false),
+          onSuccess: (created) => {
+            setIsAddModalOpen(false);
+            handleCheckOne(created.id);
+          },
         });
       }
     },
@@ -141,7 +146,7 @@ export default function Home() {
     <div className="relative min-h-screen">
       <GradientMesh />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
         <DashboardHeader
           onAddFlight={() => setIsAddModalOpen(true)}
           onCheckAll={handleCheckAll}
@@ -153,7 +158,7 @@ export default function Home() {
           refreshSecondsLeft={refreshSecondsLeft}
         />
 
-        <div className="mt-8">
+        <div className="mt-4 sm:mt-8">
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
@@ -172,7 +177,6 @@ export default function Home() {
                   onDelete={() => handleDeleteFlight(flight.id)}
                   onEdit={() => handleEditFlight(flight)}
                   onExpand={() => setExpandedFlightId(flight.id)}
-                  priceHistory={historyCache[flight.id] || []}
                 />
               ))}
             </FlightGrid>
@@ -194,7 +198,6 @@ export default function Home() {
             flight={expandedFlight}
             result={expandedResult}
             onClose={() => setExpandedFlightId(null)}
-            priceHistory={expandedHistory || []}
           />
         )}
       </AnimatePresence>
@@ -206,6 +209,17 @@ export default function Home() {
         maxPrice={alertData?.max_price || 0}
         currency={flightCurrency}
         onDismiss={dismissAlert}
+      />
+
+      <MobileFAB
+        onAddFlight={() => setIsAddModalOpen(true)}
+        onCheckAll={handleCheckAll}
+        isChecking={isCheckingAll}
+        flightCount={flights?.length || 0}
+        isConnected={isConnected}
+        refreshInterval={refreshInterval}
+        onSetRefreshInterval={setRefreshInterval}
+        refreshSecondsLeft={refreshSecondsLeft}
       />
     </div>
   );

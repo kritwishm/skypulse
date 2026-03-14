@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { X, Plane, ArrowDown } from "lucide-react";
 import Confetti from "./Confetti";
 
 interface DealAlertProps {
@@ -12,19 +13,6 @@ interface DealAlertProps {
   onDismiss: () => void;
 }
 
-function SparkleIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M12 2L13.09 8.26L18 6L14.74 10.91L21 12L14.74 13.09L18 18L13.09 15.74L12 22L10.91 15.74L6 18L9.26 13.09L3 12L9.26 10.91L6 6L10.91 8.26L12 2Z" />
-    </svg>
-  );
-}
-
 export default function DealAlert({
   isVisible,
   message,
@@ -34,6 +22,12 @@ export default function DealAlert({
   onDismiss,
 }: DealAlertProps) {
   const savings = maxPrice - cheapestPrice;
+  const savingsPercent = maxPrice > 0 ? Math.round((savings / maxPrice) * 100) : 0;
+
+  // Parse route from message like "Deal found! BLR -> GOX at 2941 (target: 5000)"
+  const routeMatch = message.match(/([A-Z]{3})\s*->\s*([A-Z]{3})/);
+  const origin = routeMatch?.[1] ?? "";
+  const destination = routeMatch?.[2] ?? "";
 
   return (
     <>
@@ -41,73 +35,166 @@ export default function DealAlert({
 
       <AnimatePresence>
         {isVisible && (
-          <motion.div
-            initial={{ opacity: 0, x: 80, y: 40 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, x: 80, y: 40 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="fixed bottom-6 right-6 z-40 w-80"
-          >
-            <div className="relative rounded-xl border border-emerald-500/40 bg-[#131b2e]/95 p-5 shadow-lg shadow-emerald-500/10 backdrop-blur-xl">
-              {/* Dismiss button */}
-              <button
-                onClick={onDismiss}
-                className="absolute right-3 top-3 rounded-md p-1 text-slate-500 transition-colors hover:bg-slate-700/50 hover:text-slate-300"
-                aria-label="Dismiss"
-              >
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
+          <>
+            {/* Mobile: full-width bottom sheet */}
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{ type: "spring", damping: 22, stiffness: 280 }}
+              className="sm:hidden fixed inset-x-0 bottom-0 z-50 p-3"
+            >
+              <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#0a1628]/98 backdrop-blur-xl shadow-2xl shadow-emerald-500/10">
+                {/* Animated gradient border glow */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-400/5" />
+                <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/8 blur-3xl" />
 
-              {/* Heading */}
-              <div className="mb-3 flex items-center gap-2">
-                <SparkleIcon className="h-5 w-5 text-green-400" />
-                <h3 className="text-lg font-semibold text-green-300">
-                  Deal Found!
-                </h3>
+                <div className="relative p-4">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <motion.div
+                        animate={{ rotate: [0, -10, 10, -10, 0] }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15"
+                      >
+                        <ArrowDown className="h-4 w-4 text-emerald-400" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-sm font-bold text-emerald-300">Price Drop!</h3>
+                        {origin && (
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className="text-xs font-semibold text-slate-300">{origin}</span>
+                            <Plane className="h-2.5 w-2.5 text-emerald-500/60 rotate-[-30deg]" />
+                            <span className="text-xs font-semibold text-slate-300">{destination}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={onDismiss}
+                      className="p-1 rounded-lg text-slate-500 active:bg-slate-700/50"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Price row */}
+                  <div className="flex items-end justify-between rounded-xl bg-emerald-500/[0.07] border border-emerald-500/10 px-3.5 py-2.5">
+                    <div>
+                      <p className="text-[9px] uppercase tracking-widest text-emerald-500/60 mb-0.5">Found at</p>
+                      <motion.p
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", delay: 0.2 }}
+                        className="text-2xl font-black tabular-nums text-emerald-400"
+                      >
+                        {currency === "INR" ? "₹" : currency}{cheapestPrice.toLocaleString()}
+                      </motion.p>
+                    </div>
+                    {savings > 0 && (
+                      <div className="text-right">
+                        <p className="text-[9px] uppercase tracking-widest text-emerald-500/60 mb-0.5">You save</p>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-lg font-bold tabular-nums text-white">
+                            {currency === "INR" ? "₹" : currency}{savings.toLocaleString()}
+                          </span>
+                          <span className="text-xs font-semibold text-emerald-400/80">
+                            {savingsPercent}%
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
+            </motion.div>
 
-              {/* Message */}
-              <p className="mb-4 text-sm leading-relaxed text-slate-400">
-                {message}
-              </p>
+            {/* Desktop: floating card */}
+            <motion.div
+              initial={{ opacity: 0, x: 60, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 60, scale: 0.9 }}
+              transition={{ type: "spring", damping: 20, stiffness: 280 }}
+              className="hidden sm:block fixed bottom-6 right-6 z-50 w-[340px]"
+            >
+              <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#0a1628]/98 backdrop-blur-xl shadow-2xl shadow-emerald-500/10">
+                {/* Glow effects */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-400/5" />
+                <div className="absolute -top-32 -right-32 h-64 w-64 rounded-full bg-emerald-500/8 blur-3xl" />
+                <div className="absolute -bottom-16 -left-16 h-32 w-32 rounded-full bg-blue-500/5 blur-2xl" />
 
-              {/* Price display */}
-              <div className="flex items-end justify-between rounded-lg bg-slate-800/50 px-4 py-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wider text-slate-500">
-                    Cheapest
-                  </p>
-                  <p className="text-2xl font-bold text-green-400">
-                    {currency}
-                    {cheapestPrice.toLocaleString()}
+                <div className="relative p-5">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <motion.div
+                        animate={{ rotate: [0, -10, 10, -10, 0] }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15"
+                      >
+                        <ArrowDown className="h-5 w-5 text-emerald-400" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-base font-bold text-emerald-300">Price Drop!</h3>
+                        {origin && (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-sm font-semibold text-slate-300">{origin}</span>
+                            <Plane className="h-3 w-3 text-emerald-500/60 rotate-[-30deg]" />
+                            <span className="text-sm font-semibold text-slate-300">{destination}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={onDismiss}
+                      className="p-1.5 rounded-lg text-slate-500 transition-colors hover:bg-slate-700/50 hover:text-slate-300"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Price display */}
+                  <div className="flex items-end justify-between rounded-xl bg-emerald-500/[0.07] border border-emerald-500/10 px-4 py-3.5">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-emerald-500/60 mb-1">Found at</p>
+                      <motion.p
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", delay: 0.2 }}
+                        className="text-3xl font-black tabular-nums text-emerald-400"
+                      >
+                        {currency === "INR" ? "₹" : currency}{cheapestPrice.toLocaleString()}
+                      </motion.p>
+                    </div>
+                    {savings > 0 && (
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase tracking-widest text-emerald-500/60 mb-1">You save</p>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-xl font-bold tabular-nums text-white">
+                            {currency === "INR" ? "₹" : currency}{savings.toLocaleString()}
+                          </span>
+                          <motion.span
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-sm font-semibold text-emerald-400/80"
+                          >
+                            {savingsPercent}%
+                          </motion.span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Budget context */}
+                  <p className="mt-3 text-[11px] text-slate-500 text-center">
+                    Budget was {currency === "INR" ? "₹" : currency}{maxPrice.toLocaleString()}
                   </p>
                 </div>
-                {savings > 0 && (
-                  <div className="text-right">
-                    <p className="text-xs uppercase tracking-wider text-slate-500">
-                      Under budget by
-                    </p>
-                    <p className="text-lg font-semibold text-green-300">
-                      {currency}
-                      {savings.toLocaleString()}
-                    </p>
-                  </div>
-                )}
               </div>
-
-              {/* Glow effect */}
-              <div className="pointer-events-none absolute -inset-px -z-10 rounded-xl bg-gradient-to-b from-emerald-400/8 to-transparent blur-sm" />
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
