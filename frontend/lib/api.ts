@@ -48,13 +48,13 @@ async function request<T>(
 }
 
 export async function fetchFlights(): Promise<FlightWatch[]> {
-  return request<FlightWatch[]>("/api/flights");
+  return request<FlightWatch[]>("/api/flights/");
 }
 
 export async function createFlight(
   data: FlightWatchCreate,
 ): Promise<FlightWatch> {
-  return request<FlightWatch>("/api/flights", {
+  return request<FlightWatch>("/api/flights/", {
     method: "POST",
     body: JSON.stringify(data),
   });
