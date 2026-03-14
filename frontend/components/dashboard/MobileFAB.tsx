@@ -30,7 +30,7 @@ const itemVariants = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { delay: i * 0.05, type: "spring", damping: 20, stiffness: 350 },
+    transition: { delay: i * 0.05, type: "spring" as const, damping: 20, stiffness: 350 },
   }),
   exit: { opacity: 0, scale: 0.6, y: 10, transition: { duration: 0.15 } },
 };
