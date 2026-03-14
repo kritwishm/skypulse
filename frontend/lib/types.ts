@@ -1,3 +1,15 @@
+// Auth
+export interface UserPublic {
+  id: string;
+  username: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: UserPublic;
+}
+
+// Flights
 export interface FlightWatch {
   id: string;
   origin: string;

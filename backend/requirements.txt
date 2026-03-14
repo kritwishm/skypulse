@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 pydantic
 swoop-flights
+sqlalchemy[asyncio]
+asyncpg
+python-jose[cryptography]
+bcrypt

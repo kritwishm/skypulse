@@ -2,20 +2,19 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, Query, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import DATA_DIR
-from price_history import init_db
+from database import init_db
+from routers.auth import router as auth_router
 from routers.flights import router as flights_router
 from ws_handler import websocket_handler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    init_db()
+    # Startup: create tables
+    await init_db()
     yield
 
 
@@ -31,10 +30,11 @@ app.add_middleware(
 )
 
 # REST routes
+app.include_router(auth_router)
 app.include_router(flights_router)
 
 
-# WebSocket route
+# WebSocket route — token passed as query param
 @app.websocket("/ws")
-async def ws_endpoint(websocket: WebSocket):
-    await websocket_handler(websocket)
+async def ws_endpoint(websocket: WebSocket, token: str = Query(None)):
+    await websocket_handler(websocket, token)

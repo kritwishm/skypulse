@@ -1,14 +1,20 @@
 import os
-from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
+# Database
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://localhost/skypulse")
+# Railway uses postgres:// scheme, SQLAlchemy needs postgresql+asyncpg://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgresql://") and "+asyncpg" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-WATCHLIST_FILE = DATA_DIR / "watchlist.json"
-DATABASE_FILE = DATA_DIR / "skypulse.db"
+# JWT
+JWT_SECRET = os.getenv("JWT_SECRET", "change-me-in-production-use-a-real-secret")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "1440"))  # 24h
 
 # Server
-HOST = os.getenv("SKYPULSE_HOST", "127.0.0.1")
+HOST = os.getenv("SKYPULSE_HOST", "0.0.0.0")
 PORT = int(os.getenv("SKYPULSE_PORT", "8000"))
 
 # Frontend URL (for CORS)
