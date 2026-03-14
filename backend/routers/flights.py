@@ -9,11 +9,13 @@ from watchlist import add_flight, delete_flight, get_flight, list_flights, updat
 router = APIRouter(prefix="/api/flights", tags=["flights"])
 
 
+@router.get("", response_model=list[FlightWatch])
 @router.get("/", response_model=list[FlightWatch])
 async def get_all_flights():
     return list_flights()
 
 
+@router.post("", response_model=FlightWatch, status_code=201)
 @router.post("/", response_model=FlightWatch, status_code=201)
 async def create_flight(body: FlightWatchCreate):
     return add_flight(body)

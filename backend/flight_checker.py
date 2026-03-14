@@ -4,6 +4,7 @@ import logging
 from datetime import date, datetime, timedelta, timezone
 from itertools import product
 
+import swoop.rpc as _swoop_rpc
 from swoop import search
 from swoop.builders import Passengers, SearchLeg, TFSData
 from swoop.exceptions import SwoopError
@@ -12,6 +13,32 @@ from google_flights_url import build_google_flights_url
 from models import FlightCheckResult, FlightResult, FlightWatch
 
 logger = logging.getLogger(__name__)
+
+# Currency → Google country code mapping for correct pricing
+_CURRENCY_TO_GL = {
+    "INR": "IN",
+    "USD": "US",
+    "EUR": "DE",
+    "GBP": "GB",
+    "AED": "AE",
+    "CAD": "CA",
+    "AUD": "AU",
+    "SGD": "SG",
+    "JPY": "JP",
+    "THB": "TH",
+    "MYR": "MY",
+}
+
+_BASE_SHOPPING_URL = _swoop_rpc.SHOPPING_RPC_URL
+_BASE_BOOKING_URL = _swoop_rpc.BOOKING_RPC_URL
+
+
+def _set_google_locale(currency: str) -> None:
+    """Patch swoop RPC URLs to include gl= param for correct currency."""
+    gl = _CURRENCY_TO_GL.get(currency, "US")
+    suffix = f"?hl=en&gl={gl}"
+    _swoop_rpc.SHOPPING_RPC_URL = _BASE_SHOPPING_URL + suffix
+    _swoop_rpc.BOOKING_RPC_URL = _BASE_BOOKING_URL + suffix
 
 MAX_RANGE_DAYS = 15  # cap per-leg date range to avoid too many API calls
 
@@ -129,6 +156,7 @@ def _search_single_date(
 def check_flight(flight: FlightWatch) -> FlightCheckResult | None:
     """Check prices across the full date range. Returns None on failure."""
     try:
+        _set_google_locale(flight.currency)
         requested_stops = flight.max_stops
 
         dep_dates = _date_range(flight.departure_date, flight.departure_date_end)

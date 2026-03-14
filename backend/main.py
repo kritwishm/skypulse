@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="SkyPulse", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="SkyPulse", version="1.0.0", lifespan=lifespan, redirect_slashes=False)
 
 # CORS - allow all for dev
 app.add_middleware(
