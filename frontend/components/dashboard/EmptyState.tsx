@@ -15,15 +15,15 @@ export default function EmptyState({ onAddFlight }: EmptyStateProps) {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="flex flex-col items-center justify-center py-24 text-center"
     >
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-800/50 border border-slate-700/30">
-        <Plane className="h-10 w-10 text-slate-600 rotate-[-30deg]" />
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-surface border border-card">
+        <Plane className="h-10 w-10 text-muted rotate-[-30deg]" />
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-300 mb-2">
+      <h2 className="text-lg font-semibold text-[var(--text-secondary)] mb-2">
         No flights tracked yet
       </h2>
 
-      <p className="text-sm text-slate-500 mb-8 max-w-xs">
+      <p className="text-sm text-tertiary mb-8 max-w-xs">
         Add your first flight to start tracking prices in real-time
       </p>
 

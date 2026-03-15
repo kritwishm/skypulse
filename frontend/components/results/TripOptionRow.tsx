@@ -24,23 +24,23 @@ export default function TripOptionRow({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: rank * 0.05, duration: 0.3 }}
-      className={`rounded-xl border border-slate-700/20 px-3 sm:px-4 py-2.5 sm:py-3
-                  ${isEven ? "bg-slate-800/20" : "bg-slate-800/40"}
-                  transition-colors hover:bg-slate-800/60`}
+      className={`rounded-xl border border-card px-3 sm:px-4 py-2.5 sm:py-3
+                  ${isEven ? "bg-[var(--bg-surface)]/50" : "bg-surface"}
+                  transition-colors duration-300 hover:bg-[var(--bg-elevated)]`}
     >
       {/* Mobile: stacked layout */}
       <div className="sm:hidden">
         {/* Top row: rank + price + date */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/15 text-[9px] font-bold text-blue-400">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--badge-blue-bg)] text-[9px] font-bold text-[var(--badge-blue-rank)]">
               #{rank}
             </span>
-            <span className="text-sm font-bold text-white tabular-nums">
+            <span className="text-sm font-bold text-primary tabular-nums">
               {formatPrice(result.price, currency)}
             </span>
             {result.departure_date && (
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px] text-tertiary">
                 {formatDate(result.departure_date)}
               </span>
             )}
@@ -58,14 +58,14 @@ export default function TripOptionRow({
       {/* Desktop: horizontal layout */}
       <div className="hidden sm:flex items-center gap-4">
         <div className="flex shrink-0 flex-col items-center gap-1 w-20">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/15 text-[10px] font-bold text-blue-400">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--badge-blue-bg)] text-[10px] font-bold text-[var(--badge-blue-rank)]">
             #{rank}
           </span>
-          <span className="text-base font-bold text-white tabular-nums">
+          <span className="text-base font-bold text-primary tabular-nums">
             {formatPrice(result.price, currency)}
           </span>
           {result.departure_date && (
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-tertiary">
               {formatDate(result.departure_date)}
             </span>
           )}

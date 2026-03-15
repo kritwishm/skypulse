@@ -88,24 +88,43 @@ All sends go through `_safe_send()` which checks `ws.client_state` before sendin
 
 ### Design System
 
-Dark grey + blue palette:
-- Background: `#0c1120`
-- Card surfaces: `#131b2e` with `border-slate-700/40`
-- Primary accent: `blue-500`/`blue-600`
-- Text hierarchy: `slate-100` → `slate-300` → `slate-500` → `slate-600`
-- Deal state: `emerald-400`/`emerald-500`
+The app supports **dark and light themes** via CSS custom properties defined in `globals.css`. Theme is toggled via `data-theme` attribute on `<html>` and managed by `ThemeContext`.
+
+**CRITICAL: Never hardcode colors.** Always use CSS variable utility classes or `var(--token)` syntax:
+- Page background: `bg-page` (not `bg-[#0c1120]`)
+- Card surfaces: `bg-card`, `bg-card-alpha` (not `bg-[#131b2e]`)
+- Elevated surfaces: `bg-elevated` (not `bg-[#1a2540]`)
+- Subtle surfaces: `bg-surface` (not `bg-slate-800/60`)
+- Inputs: `bg-input`, `border-input` (not `bg-slate-800/40 border-slate-700/50`)
+- Borders: `border-card` (not `border-slate-700/40`)
+- Text primary: `text-primary` (not `text-slate-100`)
+- Text secondary: `text-[var(--text-secondary)]` (not `text-slate-300`)
+- Text muted: `text-tertiary` / `text-muted` / `text-faint` (not `text-slate-500/600/700`)
+- Accent colors (`blue-*`, `emerald-*`, `red-*`) are fine as-is — they work in both themes
 - All components use Tailwind utility classes — no CSS modules, no styled-components
 
 ### Important Patterns
 
 - **Editing flights**: The form modal serves both add and edit. When editing, it pre-fills from the flight object. On submit for one-way, it explicitly sends `null` for return date fields so the PATCH clears them.
 - **Stop filtering**: `max_stops` in swoop is "up to N stops". We pass it to narrow Google's search, then post-filter in Python to keep only results with exactly N stops.
-- **Card click**: The entire FlightCard is clickable (expands). Footer action buttons call `e.stopPropagation()` to prevent expand when clicking check/edit/delete.
+- **Card click**: The entire FlightCard is clickable (expands). Footer action buttons call `e.stopPropagation()` to prevent expand when clicking check/edit/delete. If dates are expired, card click opens edit instead of expand.
 - **Concurrent checks**: `asyncio.Semaphore(3)` caps parallel flight searches. Each check runs `swoop.search()` in a thread via `asyncio.to_thread()`.
+- **Expired dates**: If a flight's departure date range is in the past, the card shows a warning banner and only allows edit/delete — no check or expand. Clicking the card opens edit mode directly.
+
+### Design Mentality (apply everywhere)
+
+- **Every interactive element must have `cursor-pointer`** and visible hover/tap feedback (scale, color change, or glow). If it's clickable, the user must know.
+- **Selected/active states must be high-contrast** — use solid `var(--accent)` with white text for toggles/tabs, not faint translucent backgrounds like `bg-blue-500/15`.
+- **Badges and status pills must be readable in both themes** — use CSS variable badge tokens (`--badge-green-bg`, `--badge-green-text`, etc.), never hardcoded `text-green-400` which washes out in light mode.
+- **Form validation should prevent illogical input** — no past dates in date pickers (`min` attr), disable dependent fields until prerequisites are filled, enforce max ranges.
+- **Empty/zero states should be meaningful** — never show ₹0 or "0 options". Show "No flights found" or "Not checked yet" with appropriate icons.
+- **Dark and light themes are first-class citizens** — every UI change must be verified in both themes. Use CSS variable tokens for all colors.
 
 ### What NOT to Do
 
+- **Don't hardcode colors** — never use hex colors (`#0c1120`, `#131b2e`) or hardcoded Tailwind slate colors (`text-slate-100`, `bg-slate-800/60`). Always use CSS variable tokens (`text-primary`, `bg-card`, `bg-surface`, etc.) so both themes work.
+- **Don't hardcode backend config** — never hardcode URLs, secrets, ports, or database paths. Always use environment variables with sensible defaults in `config.py`.
 - Don't use `fast_flights` — the package is `swoop-flights`, imported as `from swoop import search`
 - Don't use `datetime.utcnow()` — use `datetime.now(timezone.utc)` everywhere
-- Don't add `indigo` or `purple` colors — the palette is dark grey + blue (`slate-*` + `blue-*`)
+- Don't add `indigo` or `purple` colors — the palette is blue (`blue-*`) + accent (`emerald-*`, `red-*`)
 - Don't use `layoutId` for card ↔ expanded transitions — it causes text stretching. The expanded view uses a clean scale+fade modal animation instead.

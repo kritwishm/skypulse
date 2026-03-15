@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plane, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Plane, Eye, EyeOff, Loader2, Sun, Moon } from "lucide-react";
 import GradientMesh from "@/components/ui/GradientMesh";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function LoginPage() {
   const { login, register, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
 
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -62,6 +64,15 @@ export default function LoginPage() {
     <div className="relative min-h-screen flex items-center justify-center">
       <GradientMesh />
 
+      {/* Theme toggle */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-10 p-2 rounded-lg text-tertiary hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors"
+        title="Toggle theme"
+      >
+        {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -73,19 +84,19 @@ export default function LoginPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
             <Plane className="h-5 w-5 text-blue-400 rotate-[-30deg]" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">SkyPulse</h1>
+          <h1 className="text-2xl font-bold text-primary">SkyPulse</h1>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-slate-700/40 bg-[#131b2e]/80 backdrop-blur-xl p-6">
+        <div className="rounded-2xl border border-card bg-card-alpha backdrop-blur-xl p-6 transition-colors duration-300">
           {/* Mode tabs */}
-          <div className="flex rounded-xl bg-slate-800/60 p-1 mb-6">
+          <div className="flex rounded-xl bg-surface p-1 mb-6">
             <button
               onClick={() => { setMode("login"); setError(""); }}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
                 mode === "login"
                   ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-300"
+                  : "text-[var(--text-secondary)] hover:text-primary"
               }`}
             >
               Login
@@ -95,7 +106,7 @@ export default function LoginPage() {
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
                 mode === "register"
                   ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-300"
+                  : "text-[var(--text-secondary)] hover:text-primary"
               }`}
             >
               Register
@@ -105,7 +116,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                 Username
               </label>
               <input
@@ -114,8 +125,8 @@ export default function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
                 autoFocus
-                className="w-full rounded-xl border border-slate-700/50 bg-slate-800/40 px-3.5 py-2.5
-                           text-sm text-slate-100 placeholder-slate-600
+                className="w-full rounded-xl border border-input bg-input px-3.5 py-2.5
+                           text-sm text-primary placeholder-[var(--text-muted)]
                            focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/30
                            transition-colors"
                 placeholder="Enter username"
@@ -124,7 +135,7 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -133,8 +144,8 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
-                  className="w-full rounded-xl border border-slate-700/50 bg-slate-800/40 px-3.5 py-2.5 pr-10
-                             text-sm text-slate-100 placeholder-slate-600
+                  className="w-full rounded-xl border border-input bg-input px-3.5 py-2.5 pr-10
+                             text-sm text-primary placeholder-[var(--text-muted)]
                              focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/30
                              transition-colors"
                   placeholder="Enter password"
@@ -142,7 +153,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-tertiary hover:text-[var(--text-secondary)] transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -181,7 +192,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-slate-600 mt-4">
+        <p className="text-center text-xs text-muted mt-4">
           Track flight prices in real-time
         </p>
       </motion.div>

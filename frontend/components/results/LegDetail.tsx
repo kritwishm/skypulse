@@ -8,6 +8,11 @@ interface LegDetailProps {
   compact?: boolean;
 }
 
+const stopsBadge = (isNonstop: boolean) =>
+  isNonstop
+    ? "bg-[var(--badge-green-bg)] text-[var(--badge-green-text)]"
+    : "bg-[var(--badge-amber-bg)] text-[var(--badge-amber-text)]";
+
 export default function LegDetail({ leg, compact = false }: LegDetailProps) {
   const stopsLabel = leg.stops ?? "Nonstop";
   const isNonstop =
@@ -18,26 +23,20 @@ export default function LegDetail({ leg, compact = false }: LegDetailProps) {
   if (compact) {
     return (
       <div className="flex items-center gap-2 text-xs">
-        <span className="text-white/60 truncate max-w-[5rem]">
+        <span className="text-[var(--text-tertiary)] truncate max-w-[5rem]">
           {leg.airline ?? "Unknown"}
         </span>
-        <span className="text-white/80 tabular-nums">
+        <span className="text-[var(--text-primary)] font-medium tabular-nums">
           {leg.departure_time ?? "--:--"}
         </span>
-        <span className="text-white/30">→</span>
-        <span className="text-white/80 tabular-nums">
+        <span className="text-[var(--text-faint)]">→</span>
+        <span className="text-[var(--text-primary)] font-medium tabular-nums">
           {leg.arrival_time ?? "--:--"}
         </span>
         {leg.duration && (
-          <span className="text-white/40">{leg.duration}</span>
+          <span className="text-[var(--text-muted)]">{leg.duration}</span>
         )}
-        <span
-          className={`rounded-full px-1.5 py-px text-[9px] font-medium ${
-            isNonstop
-              ? "bg-green-500/10 text-green-400"
-              : "bg-amber-500/10 text-amber-400"
-          }`}
-        >
+        <span className={`rounded-full px-1.5 py-px text-[9px] font-semibold ${stopsBadge(isNonstop)}`}>
           {stopsLabel}
         </span>
       </div>
@@ -58,45 +57,27 @@ export default function LegDetail({ leg, compact = false }: LegDetailProps) {
             unoptimized
           />
         ) : null}
-        <span className="truncate text-xs text-white/60">
+        <span className="truncate text-xs text-[var(--text-tertiary)]">
           {leg.airline ?? "Unknown"}
         </span>
       </div>
 
       {/* Times */}
-      <div className="flex items-center gap-1.5 text-white/80">
+      <div className="flex items-center gap-1.5 text-[var(--text-primary)]">
         <span className="font-medium tabular-nums">
           {leg.departure_time ?? "--:--"}
         </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3 text-white/30"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
+        <span className="text-[var(--text-faint)]">→</span>
         <span className="font-medium tabular-nums">
           {leg.arrival_time ?? "--:--"}
         </span>
       </div>
 
       {/* Duration */}
-      <span className="text-xs text-white/40">{leg.duration ?? "--"}</span>
+      <span className="text-xs text-[var(--text-muted)]">{leg.duration ?? "--"}</span>
 
       {/* Stops */}
-      <span
-        className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-          isNonstop
-            ? "bg-green-500/10 text-green-400"
-            : "bg-amber-500/10 text-amber-400"
-        }`}
-      >
+      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${stopsBadge(isNonstop)}`}>
         {stopsLabel}
       </span>
     </div>

@@ -28,7 +28,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
           <motion.div
             className={clsx(
               "relative z-10 flex h-full w-full max-w-md flex-col",
-              "bg-[#111827]/98 backdrop-blur-xl border-l border-slate-700/40"
+              "bg-card-alpha backdrop-blur-xl border-l border-card transition-colors duration-300"
             )}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -36,11 +36,11 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-700/40 px-6 py-4">
-              <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
+            <div className="flex items-center justify-between border-b border-card px-6 py-4">
+              <h2 className="text-lg font-semibold text-primary">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300"
+                className="rounded-lg p-1.5 text-tertiary transition-colors hover:bg-[var(--bg-surface)] hover:text-[var(--text-secondary)]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

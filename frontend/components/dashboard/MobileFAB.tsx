@@ -78,7 +78,7 @@ export default function MobileFAB({
                       initial={{ opacity: 0, scale: 0.9, x: 8 }}
                       animate={{ opacity: 1, scale: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.9, x: 8 }}
-                      className="absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded-xl border border-slate-700/50 bg-[#131b2e] p-1 shadow-xl shadow-black/40"
+                      className="absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded-xl border border-card bg-card p-1 shadow-xl shadow-black/40 transition-colors duration-300"
                     >
                       <div className="flex gap-0.5">
                         {INTERVALS.map((val) => (
@@ -90,8 +90,8 @@ export default function MobileFAB({
                             }}
                             className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
                               refreshInterval === val
-                                ? "bg-blue-500/20 text-blue-300"
-                                : "text-slate-400 active:bg-slate-800"
+                                ? "bg-[var(--accent-soft)] text-[var(--accent)] font-semibold"
+                                : "text-[var(--text-secondary)] active:bg-[var(--bg-elevated)]"
                             }`}
                           >
                             {val === 0 ? "Off" : `${val}m`}
@@ -112,7 +112,7 @@ export default function MobileFAB({
                   className={`flex items-center gap-1.5 h-10 pl-3 pr-3.5 rounded-full shadow-lg shadow-black/30 border text-xs font-medium ${
                     isAutoRefreshOn
                       ? "bg-blue-500/15 border-blue-500/30 text-blue-400"
-                      : "bg-[#1a2540] border-slate-700/50 text-slate-400"
+                      : "bg-elevated border-card text-[var(--text-secondary)]"
                   }`}
                 >
                   <Timer className="h-3.5 w-3.5" />
@@ -131,8 +131,8 @@ export default function MobileFAB({
                 onClick={() => { close(); onCheckAll(); }}
                 disabled={isChecking || flightCount === 0}
                 className="flex items-center gap-1.5 h-10 pl-3 pr-3.5 rounded-full
-                           bg-[#1a2540] border border-slate-700/50 shadow-lg shadow-black/30
-                           text-slate-300 text-xs font-medium
+                           bg-elevated border border-card shadow-lg shadow-black/30
+                           text-[var(--text-secondary)] text-xs font-medium
                            disabled:opacity-40"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${isChecking ? "animate-spin" : ""}`} />
@@ -171,7 +171,7 @@ export default function MobileFAB({
         onClick={() => { setIsOpen((p) => !p); setShowTimerPicker(false); }}
         className={`flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-all duration-200 ${
           isOpen
-            ? "bg-slate-700/90 shadow-black/30"
+            ? "bg-[var(--text-muted)] shadow-black/30"
             : "bg-blue-600 shadow-blue-500/30"
         }`}
       >

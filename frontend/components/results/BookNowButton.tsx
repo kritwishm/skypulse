@@ -14,7 +14,7 @@ export default function BookNowButton({ url }: BookNowButtonProps) {
     return (
       <button
         disabled
-        className={`${baseClasses} border-white/5 bg-white/5 text-white/20 cursor-not-allowed`}
+        className={`${baseClasses} border-[var(--border-card)] bg-[var(--bg-surface)] text-[var(--text-faint)] cursor-not-allowed`}
       >
         Book Now
         <span className="text-[10px]">&nearr;</span>
@@ -29,9 +29,9 @@ export default function BookNowButton({ url }: BookNowButtonProps) {
       rel="noopener noreferrer"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`${baseClasses} border-blue-500/25 bg-blue-500/10
-                  text-blue-400 hover:bg-blue-500/20 hover:text-blue-300
-                  hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/10`}
+      className={`${baseClasses} border-[var(--accent)]/20 bg-[var(--accent-soft)]
+                  text-[var(--accent)] hover:bg-[var(--accent)]/15 hover:text-[var(--accent-hover)]
+                  hover:border-[var(--accent)]/30 hover:shadow-lg hover:shadow-[var(--accent)]/10`}
     >
       Book Now
       <svg

@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Plane, ArrowDown } from "lucide-react";
+import { getAirport } from "@/lib/getAirport";
 import Confetti from "./Confetti";
 
 interface DealAlertProps {
@@ -28,6 +29,8 @@ export default function DealAlert({
   const routeMatch = message.match(/([A-Z]{3})\s*->\s*([A-Z]{3})/);
   const origin = routeMatch?.[1] ?? "";
   const destination = routeMatch?.[2] ?? "";
+  const originAirport = origin ? getAirport(origin) : undefined;
+  const destAirport = destination ? getAirport(destination) : undefined;
 
   return (
     <>
@@ -44,7 +47,7 @@ export default function DealAlert({
               transition={{ type: "spring", damping: 22, stiffness: 280 }}
               className="sm:hidden fixed inset-x-0 bottom-0 z-50 p-3"
             >
-              <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#0a1628]/98 backdrop-blur-xl shadow-2xl shadow-emerald-500/10">
+              <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-card backdrop-blur-xl shadow-2xl shadow-emerald-500/10">
                 {/* Animated gradient border glow */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-400/5" />
                 <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/8 blur-3xl" />
@@ -64,16 +67,20 @@ export default function DealAlert({
                         <h3 className="text-sm font-bold text-emerald-300">Price Drop!</h3>
                         {origin && (
                           <div className="flex items-center gap-1 mt-0.5">
-                            <span className="text-xs font-semibold text-slate-300">{origin}</span>
+                            <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                              {origin}{originAirport ? ` ${originAirport.city}` : ""}
+                            </span>
                             <Plane className="h-2.5 w-2.5 text-emerald-500/60 rotate-[-30deg]" />
-                            <span className="text-xs font-semibold text-slate-300">{destination}</span>
+                            <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                              {destination}{destAirport ? ` ${destAirport.city}` : ""}
+                            </span>
                           </div>
                         )}
                       </div>
                     </div>
                     <button
                       onClick={onDismiss}
-                      className="p-1 rounded-lg text-slate-500 active:bg-slate-700/50"
+                      className="p-1 rounded-lg text-tertiary active:bg-[var(--bg-surface)]"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -96,7 +103,7 @@ export default function DealAlert({
                       <div className="text-right">
                         <p className="text-[9px] uppercase tracking-widest text-emerald-500/60 mb-0.5">You save</p>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-bold tabular-nums text-white">
+                          <span className="text-lg font-bold tabular-nums text-primary">
                             {currency === "INR" ? "₹" : currency}{savings.toLocaleString()}
                           </span>
                           <span className="text-xs font-semibold text-emerald-400/80">
@@ -118,7 +125,7 @@ export default function DealAlert({
               transition={{ type: "spring", damping: 20, stiffness: 280 }}
               className="hidden sm:block fixed bottom-6 right-6 z-50 w-[340px]"
             >
-              <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#0a1628]/98 backdrop-blur-xl shadow-2xl shadow-emerald-500/10">
+              <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-card backdrop-blur-xl shadow-2xl shadow-emerald-500/10">
                 {/* Glow effects */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-400/5" />
                 <div className="absolute -top-32 -right-32 h-64 w-64 rounded-full bg-emerald-500/8 blur-3xl" />
@@ -139,16 +146,20 @@ export default function DealAlert({
                         <h3 className="text-base font-bold text-emerald-300">Price Drop!</h3>
                         {origin && (
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-sm font-semibold text-slate-300">{origin}</span>
+                            <span className="text-sm font-semibold text-[var(--text-secondary)]">
+                              {origin}{originAirport ? ` ${originAirport.city}` : ""}
+                            </span>
                             <Plane className="h-3 w-3 text-emerald-500/60 rotate-[-30deg]" />
-                            <span className="text-sm font-semibold text-slate-300">{destination}</span>
+                            <span className="text-sm font-semibold text-[var(--text-secondary)]">
+                              {destination}{destAirport ? ` ${destAirport.city}` : ""}
+                            </span>
                           </div>
                         )}
                       </div>
                     </div>
                     <button
                       onClick={onDismiss}
-                      className="p-1.5 rounded-lg text-slate-500 transition-colors hover:bg-slate-700/50 hover:text-slate-300"
+                      className="p-1.5 rounded-lg text-tertiary transition-colors hover:bg-[var(--bg-surface)] hover:text-[var(--text-secondary)]"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -171,7 +182,7 @@ export default function DealAlert({
                       <div className="text-right">
                         <p className="text-[10px] uppercase tracking-widest text-emerald-500/60 mb-1">You save</p>
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-xl font-bold tabular-nums text-white">
+                          <span className="text-xl font-bold tabular-nums text-primary">
                             {currency === "INR" ? "₹" : currency}{savings.toLocaleString()}
                           </span>
                           <motion.span
@@ -188,7 +199,7 @@ export default function DealAlert({
                   </div>
 
                   {/* Budget context */}
-                  <p className="mt-3 text-[11px] text-slate-500 text-center">
+                  <p className="mt-3 text-[11px] text-tertiary text-center">
                     Budget was {currency === "INR" ? "₹" : currency}{maxPrice.toLocaleString()}
                   </p>
                 </div>

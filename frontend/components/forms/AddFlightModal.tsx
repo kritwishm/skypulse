@@ -22,7 +22,7 @@ const STOP_OPTIONS = [
 ] as const;
 
 const inputClasses =
-  "rounded-lg border border-slate-700/40 bg-slate-800/40 px-3 py-2.5 text-slate-200 placeholder-slate-600 outline-none transition-colors focus:border-blue-500/40 focus:bg-slate-800/50 focus:ring-1 focus:ring-blue-500/20 [color-scheme:dark]";
+  "rounded-lg border border-input bg-input px-3 py-2.5 text-primary placeholder-[var(--text-muted)] outline-none transition-colors focus:border-blue-500/40 focus:bg-[var(--bg-elevated)] focus:ring-1 focus:ring-blue-500/20";
 
 const initialState: FlightWatchCreate = {
   origin: "",
@@ -121,67 +121,91 @@ export default function AddFlightModal({
   const segmentBtn = (active: boolean) =>
     `flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
       active
-        ? "bg-blue-500/15 text-blue-300 shadow-sm"
-        : "text-slate-500 hover:text-slate-300"
+        ? "bg-[var(--accent)] text-white shadow-sm"
+        : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
     }`;
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={isEditing ? "Edit Flight Watch" : "Add Flight Watch"}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {/* Origin & Destination */}
-        <div className="grid grid-cols-2 gap-4">
-          <AirportInput
-            value={form.origin}
-            onChange={(v) => update("origin", v)}
-            placeholder="DEL"
-            label="Origin"
-            required
-          />
-          <AirportInput
-            value={form.destination}
-            onChange={(v) => update("destination", v)}
-            placeholder="BOM"
-            label="Destination"
-            required
-          />
+        <div className="relative flex items-stretch gap-1.5">
+          <div className="flex-1 min-w-0">
+            <AirportInput
+              value={form.origin}
+              onChange={(v) => update("origin", v)}
+              placeholder="DEL"
+              label="Origin"
+              required
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const tmp = form.origin;
+              update("origin", form.destination);
+              update("destination", tmp);
+            }}
+            className="mt-6 self-center flex h-8 w-8 shrink-0 items-center justify-center rounded-full
+                       border border-card bg-[var(--bg-surface)] text-[var(--text-muted)]
+                       hover:text-[var(--accent)] hover:border-[var(--accent)]/30 hover:bg-[var(--accent-soft)]
+                       transition-all active:scale-90"
+            title="Swap origin and destination"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 3L4 7l4 4" /><path d="M16 21l4-4-4-4" /><line x1="4" y1="7" x2="20" y2="7" /><line x1="20" y1="17" x2="4" y2="17" />
+            </svg>
+          </button>
+          <div className="flex-1 min-w-0">
+            <AirportInput
+              value={form.destination}
+              onChange={(v) => update("destination", v)}
+              placeholder="BOM"
+              label="Destination"
+              required
+            />
+          </div>
         </div>
 
         {/* Departure Date Range */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-slate-400">
+          <label className="text-sm text-[var(--text-secondary)]">
             Departure Dates<span className="text-red-400 ml-0.5">*</span>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-slate-500">From</span>
+              <span className="text-[11px] text-tertiary">From</span>
               <input
                 type="date"
                 value={form.departure_date}
                 onChange={(e) => update("departure_date", e.target.value)}
                 required
+                min={new Date().toISOString().split("T")[0]}
                 className={inputClasses}
               />
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-slate-500">To <span className="text-slate-600">(optional)</span></span>
+              <span className="text-[11px] text-tertiary">To <span className="text-muted">(optional)</span></span>
               <input
                 type="date"
                 value={form.departure_date_end ?? ""}
                 onChange={(e) => update("departure_date_end", e.target.value || undefined)}
+                disabled={!form.departure_date}
                 min={form.departure_date || undefined}
-                className={inputClasses}
+                max={form.departure_date ? new Date(new Date(form.departure_date).getTime() + 15 * 86400000).toISOString().split("T")[0] : undefined}
+                className={`${inputClasses} disabled:opacity-40 disabled:cursor-not-allowed`}
               />
             </div>
           </div>
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-muted">
             Set a range to search the cheapest across multiple dates (max 15 days)
           </p>
         </div>
 
         {/* Trip Type toggle */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-slate-400">Trip Type</label>
-          <div className="flex rounded-lg border border-slate-700/40 bg-slate-800/40 p-1">
+          <label className="text-sm text-[var(--text-secondary)]">Trip Type</label>
+          <div className="flex rounded-lg border border-input bg-input p-1">
             {(["one-way", "round-trip"] as const).map((type) => (
               <button
                 key={type}
@@ -205,12 +229,12 @@ export default function AddFlightModal({
         {/* Return Date Range (only for round-trip) */}
         {form.trip_type === "round-trip" && (
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-slate-400">
+            <label className="text-sm text-[var(--text-secondary)]">
               Return Dates<span className="text-red-400 ml-0.5">*</span>
             </label>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1">
-                <span className="text-[11px] text-slate-500">From</span>
+                <span className="text-[11px] text-tertiary">From</span>
                 <input
                   type="date"
                   value={form.return_date ?? ""}
@@ -221,13 +245,15 @@ export default function AddFlightModal({
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[11px] text-slate-500">To <span className="text-slate-600">(optional)</span></span>
+                <span className="text-[11px] text-tertiary">To <span className="text-muted">(optional)</span></span>
                 <input
                   type="date"
                   value={form.return_date_end ?? ""}
                   onChange={(e) => update("return_date_end", e.target.value || undefined)}
+                  disabled={!form.return_date}
                   min={form.return_date || undefined}
-                  className={inputClasses}
+                  max={form.return_date ? new Date(new Date(form.return_date).getTime() + 15 * 86400000).toISOString().split("T")[0] : undefined}
+                  className={`${inputClasses} disabled:opacity-40 disabled:cursor-not-allowed`}
                 />
               </div>
             </div>
@@ -236,8 +262,8 @@ export default function AddFlightModal({
 
         {/* Stops */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-slate-400">Stops</label>
-          <div className="flex rounded-lg border border-slate-700/40 bg-slate-800/40 p-1">
+          <label className="text-sm text-[var(--text-secondary)]">Stops</label>
+          <div className="flex rounded-lg border border-input bg-input p-1">
             {STOP_OPTIONS.map((opt) => (
               <button
                 key={opt.label}
@@ -253,14 +279,14 @@ export default function AddFlightModal({
 
         {/* Currency */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-slate-400">Currency</label>
+          <label className="text-sm text-[var(--text-secondary)]">Currency</label>
           <select
             value={form.currency}
             onChange={(e) => update("currency", e.target.value)}
             className={`${inputClasses} appearance-none`}
           >
             {CURRENCIES.map((c) => (
-              <option key={c} value={c} className="bg-slate-900 text-slate-200">
+              <option key={c} value={c} className="bg-[var(--bg-card)] text-primary">
                 {c}
               </option>
             ))}
@@ -269,23 +295,35 @@ export default function AddFlightModal({
 
         {/* Max Price / Deal Alert */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-slate-400">
+          <label className="text-sm text-[var(--text-secondary)]">
             Max Price / Deal Alert
           </label>
-          <input
-            type="number"
-            value={form.max_price ?? ""}
-            onChange={(e) =>
-              update(
-                "max_price",
-                e.target.value ? Number(e.target.value) : undefined,
-              )
-            }
-            placeholder="e.g. 7000"
-            min={0}
-            className={inputClasses}
-          />
-          <p className="text-xs text-slate-600">
+          <div className="relative">
+            <input
+              type="number"
+              value={form.max_price ?? ""}
+              onChange={(e) =>
+                update(
+                  "max_price",
+                  e.target.value ? Number(e.target.value) : undefined,
+                )
+              }
+              placeholder="e.g. 7000"
+              min={0}
+              className={`${inputClasses} pr-8`}
+            />
+            {form.max_price != null && (
+              <button
+                type="button"
+                onClick={() => update("max_price", undefined)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded
+                           text-[var(--text-faint)] hover:text-[var(--text-secondary)] transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-muted">
             Get alerted when price drops below this amount
           </p>
         </div>

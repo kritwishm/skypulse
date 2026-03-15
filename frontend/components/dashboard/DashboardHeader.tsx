@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plane, Plus, RefreshCw, Timer, ChevronDown, LogOut } from "lucide-react";
+import { Plane, Plus, RefreshCw, Timer, ChevronDown, LogOut, Sun, Moon } from "lucide-react";
 import PulsingDot from "@/components/ui/PulsingDot";
+import { useTheme } from "@/contexts/ThemeContext";
 import type { RefreshInterval } from "@/hooks/useAutoRefresh";
 
 interface DashboardHeaderProps {
@@ -47,6 +48,7 @@ export default function DashboardHeader({
   onLogout,
 }: DashboardHeaderProps) {
   const [showRefreshMenu, setShowRefreshMenu] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const isAutoRefreshOn = refreshInterval > 0;
 
   return (
@@ -56,14 +58,14 @@ export default function DashboardHeader({
         <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-blue-500/10">
           <Plane className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400 rotate-[-30deg]" />
         </div>
-        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-primary">
           SkyPulse
         </h1>
         {/* Mobile: connection dot + countdown */}
         <div className="flex sm:hidden items-center gap-2">
           <div className="flex items-center gap-1.5">
             <PulsingDot color={isConnected ? "green" : "red"} size="sm" />
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-tertiary">
               {isConnected ? "Live" : "Offline"}
             </span>
           </div>
@@ -76,23 +78,33 @@ export default function DashboardHeader({
         </div>
       </div>
 
-      {/* Mobile: logout button (top right) */}
-      {onLogout && (
+      {/* Mobile: theme toggle + logout (top right) */}
+      <div className="flex sm:hidden items-center gap-0.5">
         <motion.button
           whileTap={{ scale: 0.9 }}
-          onClick={onLogout}
-          className="flex sm:hidden items-center gap-1.5 p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-          title="Logout"
+          onClick={toggleTheme}
+          className="p-2 rounded-lg text-tertiary hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors"
+          title="Toggle theme"
         >
-          <LogOut className="h-4 w-4" />
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </motion.button>
-      )}
+        {onLogout && (
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={onLogout}
+            className="p-2 rounded-lg text-tertiary hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            title="Logout"
+          >
+            <LogOut className="h-4 w-4" />
+          </motion.button>
+        )}
+      </div>
 
       {/* Desktop controls — hidden on mobile (FAB handles it) */}
       <div className="hidden sm:flex items-center gap-2">
         <div className="flex items-center gap-2 mr-1">
           <PulsingDot color={isConnected ? "green" : "red"} size="sm" />
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-tertiary">
             {isConnected ? "Live" : "Offline"}
           </span>
         </div>
@@ -105,7 +117,7 @@ export default function DashboardHeader({
             className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-medium rounded-lg sm:rounded-xl border transition-all duration-200 ${
               isAutoRefreshOn
                 ? "text-blue-400 bg-blue-500/10 border-blue-500/25"
-                : "text-slate-400 bg-slate-800/60 border-slate-700/50"
+                : "text-[var(--text-secondary)] bg-surface border-card"
             }`}
           >
             <Timer className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -130,9 +142,9 @@ export default function DashboardHeader({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 z-50 w-40 sm:w-44 rounded-xl border border-slate-700/40 bg-[#131b2e] p-1.5 shadow-xl shadow-black/30"
+                  className="absolute right-0 top-full mt-2 z-50 w-40 sm:w-44 rounded-xl border border-card bg-card p-1.5 shadow-xl shadow-black/30 transition-colors duration-300"
                 >
-                  <p className="px-2 py-1 text-[10px] uppercase tracking-wider text-slate-500">
+                  <p className="px-2 py-1 text-[10px] uppercase tracking-wider text-tertiary">
                     Auto-refresh
                   </p>
                   {INTERVALS.map((opt) => (
@@ -144,8 +156,8 @@ export default function DashboardHeader({
                       }}
                       className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
                         refreshInterval === opt.value
-                          ? "bg-blue-500/15 text-blue-300"
-                          : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                          ? "bg-[var(--accent-soft)] text-[var(--accent)] font-semibold"
+                          : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] hover:text-primary"
                       }`}
                     >
                       <span>{opt.value === 0 ? "Off" : `Every ${opt.value} min`}</span>
@@ -166,8 +178,8 @@ export default function DashboardHeader({
           onClick={onCheckAll}
           disabled={isChecking || flightCount === 0}
           className="relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-sm font-medium
-                     text-slate-300 bg-slate-800/60 border border-slate-700/50 rounded-lg sm:rounded-xl
-                     hover:bg-slate-800 hover:border-slate-600/50 hover:text-slate-200
+                     text-[var(--text-secondary)] bg-surface border border-card rounded-lg sm:rounded-xl
+                     hover:bg-[var(--bg-elevated)] hover:border-[var(--border-card)] hover:text-primary
                      disabled:opacity-40 disabled:cursor-not-allowed
                      transition-all duration-200"
         >
@@ -197,22 +209,30 @@ export default function DashboardHeader({
           <span className="sm:hidden">Add</span>
         </motion.button>
 
-        {/* User + Logout */}
-        {onLogout && (
-          <div className="flex items-center gap-2 ml-1 pl-2 border-l border-slate-700/40">
-            {username && (
-              <span className="text-xs text-slate-500 hidden sm:inline">{username}</span>
-            )}
+        {/* Theme + User + Logout */}
+        <div className="flex items-center gap-1 ml-1 pl-2 border-l border-card">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={toggleTheme}
+            className="p-1.5 sm:p-2 rounded-lg text-tertiary hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors"
+            title="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+          </motion.button>
+          {username && (
+            <span className="text-xs text-tertiary hidden sm:inline">{username}</span>
+          )}
+          {onLogout && (
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={onLogout}
-              className="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg text-tertiary hover:text-red-400 hover:bg-red-500/10 transition-colors"
               title="Logout"
             >
               <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </motion.button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </header>
   );
