@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plane, X } from "lucide-react";
 import AnimatedPrice from "@/components/ui/AnimatedPrice";
@@ -24,6 +25,12 @@ export default function FlightCardExpanded({
 }: FlightCardExpandedProps) {
   const originAirport = getAirport(flight.origin);
   const destAirport = getAirport(flight.destination);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
 
   return (
     <AnimatePresence>
@@ -150,7 +157,7 @@ export default function FlightCardExpanded({
           </div>
 
           {/* ── Scrollable body ── */}
-          <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4 sm:py-5">
+          <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-4 sm:px-6 py-4 sm:py-5">
             <h3 className="text-[10px] sm:text-xs font-medium text-tertiary uppercase tracking-wider mb-2 sm:mb-3">
               All Options ({result.result_count})
             </h3>
