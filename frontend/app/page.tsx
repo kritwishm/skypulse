@@ -169,11 +169,13 @@ export default function Home() {
     <div className="relative min-h-screen">
       <GradientMesh />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-        {/* Sticky header + toolbar — single glass layer */}
-        <div className={`sticky top-0 z-30 pt-4 sm:pt-8 pb-3 sm:pb-4 bg-page backdrop-blur-3xl transition-shadow duration-300 ${
-          scrolled ? "shadow-xl shadow-black/40" : ""
-        }`}>
+      {/* Full-width sticky glass header */}
+      <div className={`sticky top-0 z-30 w-full border-b transition-all duration-300 ${
+        scrolled
+          ? "bg-[var(--bg-card-alpha)] backdrop-blur-xl border-[var(--border-card)] shadow-lg shadow-black/10"
+          : "bg-transparent border-transparent"
+      }`}>
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-3 sm:pb-4">
           <DashboardHeader
             onAddFlight={() => setIsAddModalOpen(true)}
             onCheckAll={handleCheckAll}
@@ -201,7 +203,9 @@ export default function Home() {
             );
           })()}
         </div>
+      </div>
 
+      <div className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
         <div className="mt-1 sm:mt-2">
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
