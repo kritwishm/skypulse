@@ -7,6 +7,7 @@ export interface DealAlertData {
   message: string;
   cheapest_price: number;
   max_price: number;
+  cheapest_date?: string | null;
 }
 
 const AUTO_DISMISS_MS = 8_000;

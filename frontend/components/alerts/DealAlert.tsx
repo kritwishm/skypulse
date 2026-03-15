@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Plane, ArrowDown } from "lucide-react";
+import { X, Plane, ArrowDown, Calendar } from "lucide-react";
 import { getAirport } from "@/lib/getAirport";
+import { formatDate } from "@/lib/format";
 import Confetti from "./Confetti";
 
 interface DealAlertProps {
@@ -11,6 +12,7 @@ interface DealAlertProps {
   cheapestPrice: number;
   maxPrice: number;
   currency: string;
+  cheapestDate?: string | null;
   onDismiss: () => void;
 }
 
@@ -20,6 +22,7 @@ export default function DealAlert({
   cheapestPrice,
   maxPrice,
   currency,
+  cheapestDate,
   onDismiss,
 }: DealAlertProps) {
   const savings = maxPrice - cheapestPrice;
@@ -113,6 +116,14 @@ export default function DealAlert({
                       </div>
                     )}
                   </div>
+
+                  {/* Best date */}
+                  {cheapestDate && (
+                    <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-emerald-400/70">
+                      <Calendar className="h-3 w-3" />
+                      Best on {formatDate(cheapestDate)}
+                    </p>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -198,10 +209,18 @@ export default function DealAlert({
                     )}
                   </div>
 
-                  {/* Budget context */}
-                  <p className="mt-3 text-[11px] text-tertiary text-center">
-                    Budget was {currency === "INR" ? "₹" : currency}{maxPrice.toLocaleString()}
-                  </p>
+                  {/* Best date + Budget context */}
+                  <div className="mt-3 flex flex-col items-center gap-1">
+                    {cheapestDate && (
+                      <p className="flex items-center gap-1 text-[11px] text-emerald-400/70">
+                        <Calendar className="h-3 w-3" />
+                        Best on {formatDate(cheapestDate)}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-tertiary">
+                      Budget was {currency === "INR" ? "₹" : currency}{maxPrice.toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>

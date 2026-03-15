@@ -85,6 +85,7 @@ export default function Home() {
             message: msg.message,
             cheapest_price: msg.cheapest_price,
             max_price: msg.max_price,
+            cheapest_date: flightResults[msg.id]?.cheapest_date ?? null,
           });
           break;
 
@@ -223,20 +224,26 @@ export default function Home() {
                     </button>
                   </div>
                 ) : (
-                  <FlightGrid>
-                    {filtered.map((flight) => (
-                      <FlightCard
-                        key={flight.id}
-                        flight={flight}
-                        result={flightResults[flight.id] || null}
-                        isChecking={checkingIds.has(flight.id)}
-                        onCheck={() => handleCheckOne(flight.id)}
-                        onDelete={() => handleDeleteFlight(flight.id)}
-                        onEdit={() => handleEditFlight(flight)}
-                        onExpand={() => setExpandedFlightId(flight.id)}
-                      />
-                    ))}
-                  </FlightGrid>
+                  <>
+                    <FlightGrid>
+                      {filtered.map((flight) => (
+                        <FlightCard
+                          key={flight.id}
+                          flight={flight}
+                          result={flightResults[flight.id] || null}
+                          isChecking={checkingIds.has(flight.id)}
+                          onCheck={() => handleCheckOne(flight.id)}
+                          onDelete={() => handleDeleteFlight(flight.id)}
+                          onEdit={() => handleEditFlight(flight)}
+                          onExpand={() => setExpandedFlightId(flight.id)}
+                        />
+                      ))}
+                    </FlightGrid>
+                    <p className="text-center text-sm text-muted py-8">
+                      That&apos;s all your watches.<br />
+                      Sit back, we&apos;ll do the stalking ✈️
+                    </p>
+                  </>
                 )}
               </div>
             );
@@ -268,6 +275,7 @@ export default function Home() {
         cheapestPrice={alertData?.cheapest_price || 0}
         maxPrice={alertData?.max_price || 0}
         currency={flightCurrency}
+        cheapestDate={alertData?.cheapest_date}
         onDismiss={dismissAlert}
       />
 
