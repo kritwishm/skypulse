@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import GradientMesh from "@/components/ui/GradientMesh";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -15,9 +16,19 @@ import { useFlights, useCreateFlight, useUpdateFlight, useDeleteFlight } from "@
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useDealAlert } from "@/hooks/useDealAlert";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { useAuth } from "@/contexts/AuthContext";
 import type { FlightWatch, FlightCheckResult, FlightWatchCreate, WSIncoming } from "@/lib/types";
 
 export default function Home() {
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
   const { flights, isLoading, refetch } = useFlights();
   const createFlight = useCreateFlight();
   const updateFlightMutation = useUpdateFlight();
@@ -142,6 +153,8 @@ export default function Home() {
 
   const flightCurrency = expandedFlight?.currency || "INR";
 
+  if (authLoading || !isAuthenticated) return null;
+
   return (
     <div className="relative min-h-screen">
       <GradientMesh />
@@ -156,6 +169,8 @@ export default function Home() {
           refreshInterval={refreshInterval}
           onSetRefreshInterval={setRefreshInterval}
           refreshSecondsLeft={refreshSecondsLeft}
+          username={user?.username}
+          onLogout={logout}
         />
 
         <div className="mt-4 sm:mt-8">

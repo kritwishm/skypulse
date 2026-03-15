@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plane, Plus, RefreshCw, Timer, ChevronDown } from "lucide-react";
+import { Plane, Plus, RefreshCw, Timer, ChevronDown, LogOut } from "lucide-react";
 import PulsingDot from "@/components/ui/PulsingDot";
 import type { RefreshInterval } from "@/hooks/useAutoRefresh";
 
@@ -15,6 +15,8 @@ interface DashboardHeaderProps {
   refreshInterval: RefreshInterval;
   onSetRefreshInterval: (mins: RefreshInterval) => void;
   refreshSecondsLeft: number;
+  username?: string;
+  onLogout?: () => void;
 }
 
 const INTERVALS: { value: RefreshInterval; label: string }[] = [
@@ -41,6 +43,8 @@ export default function DashboardHeader({
   refreshInterval,
   onSetRefreshInterval,
   refreshSecondsLeft,
+  username,
+  onLogout,
 }: DashboardHeaderProps) {
   const [showRefreshMenu, setShowRefreshMenu] = useState(false);
   const isAutoRefreshOn = refreshInterval > 0;
@@ -172,6 +176,23 @@ export default function DashboardHeader({
           <span className="hidden sm:inline">Add Flight</span>
           <span className="sm:hidden">Add</span>
         </motion.button>
+
+        {/* User + Logout */}
+        {onLogout && (
+          <div className="flex items-center gap-2 ml-1 pl-2 border-l border-slate-700/40">
+            {username && (
+              <span className="text-xs text-slate-500 hidden sm:inline">{username}</span>
+            )}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={onLogout}
+              className="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              title="Logout"
+            >
+              <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </motion.button>
+          </div>
+        )}
       </div>
     </header>
   );

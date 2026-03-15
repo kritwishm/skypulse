@@ -6,6 +6,25 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+# ── Auth ──
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+
+class UserPublic(BaseModel):
+    id: str
+    username: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserPublic
+
+
+# ── Flights ──
+
 class FlightWatchCreate(BaseModel):
     origin: str
     destination: str

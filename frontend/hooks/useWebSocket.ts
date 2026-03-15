@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getToken } from "@/lib/auth";
 import { WS_URL } from "@/lib/constants";
 import type { WSIncoming, WSOutgoing } from "@/lib/types";
 
@@ -37,7 +38,9 @@ export function useWebSocket(callbacks: UseWebSocketCallbacks) {
       wsRef.current.close();
     }
 
-    const ws = new WebSocket(WS_URL);
+    const token = getToken();
+    if (!token) return; // Don't connect without auth
+    const ws = new WebSocket(`${WS_URL}?token=${token}`);
 
     ws.onopen = () => {
       if (!mountedRef.current) return;
