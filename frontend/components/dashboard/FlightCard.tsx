@@ -175,7 +175,7 @@ export default function FlightCard({
               </div>
 
               {/* Best date callout */}
-              {result.cheapest_date && flight.departure_date_end && (
+              {result.cheapest_date && (
                 <p className="text-center text-[11px] sm:text-xs text-[var(--accent)] mb-1">
                   Best on {formatDate(result.cheapest_date)}
                   {cheapest?.return_date && ` · return ${formatDate(cheapest.return_date)}`}
@@ -260,7 +260,7 @@ export default function FlightCard({
                 {formatPrice(flight.cheapest_price, flight.currency)}
               </span>
               <p className="text-[11px] sm:text-xs text-muted mt-1">Last known price</p>
-              {flight.cheapest_date && flight.departure_date_end && (
+              {flight.cheapest_date && (
                 <p className="text-[11px] sm:text-xs text-[var(--accent)] mt-1">
                   Best on {formatDate(flight.cheapest_date)}
                 </p>

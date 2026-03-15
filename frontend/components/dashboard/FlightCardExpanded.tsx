@@ -128,7 +128,7 @@ export default function FlightCardExpanded({
                   currency={flight.currency}
                   className="text-xl sm:text-2xl font-bold text-primary"
                 />
-                {result.cheapest_date && flight.departure_date_end && (
+                {result.cheapest_date && (
                   <p className="text-[10px] sm:text-[11px] text-[var(--accent)] mt-0.5">
                     on {formatDate(result.cheapest_date)}
                   </p>
