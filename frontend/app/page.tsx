@@ -42,6 +42,13 @@ export default function Home() {
   const [checkingIds, setCheckingIds] = useState<Set<string>>(new Set());
   const [isCheckingAll, setIsCheckingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const { showAlert, alertData, triggerAlert, dismissAlert } = useDealAlert();
 
@@ -161,21 +168,40 @@ export default function Home() {
     <div className="relative min-h-screen">
       <GradientMesh />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
-        <DashboardHeader
-          onAddFlight={() => setIsAddModalOpen(true)}
-          onCheckAll={handleCheckAll}
-          isChecking={isCheckingAll}
-          flightCount={flights?.length || 0}
-          isConnected={isConnected}
-          refreshInterval={refreshInterval}
-          onSetRefreshInterval={setRefreshInterval}
-          refreshSecondsLeft={refreshSecondsLeft}
-          username={user?.username}
-          onLogout={logout}
-        />
+      <div className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        {/* Sticky header + toolbar — single glass layer */}
+        <div className={`sticky top-0 z-30 pt-4 sm:pt-8 pb-3 sm:pb-4 bg-page backdrop-blur-3xl transition-shadow duration-300 ${
+          scrolled ? "shadow-xl shadow-black/40" : ""
+        }`}>
+          <DashboardHeader
+            onAddFlight={() => setIsAddModalOpen(true)}
+            onCheckAll={handleCheckAll}
+            isChecking={isCheckingAll}
+            flightCount={flights?.length || 0}
+            isConnected={isConnected}
+            refreshInterval={refreshInterval}
+            onSetRefreshInterval={setRefreshInterval}
+            refreshSecondsLeft={refreshSecondsLeft}
+            username={user?.username}
+            onLogout={logout}
+          />
+          {flights && flights.length > 0 && (() => {
+            const filtered = filterFlights(flights, searchQuery);
+            return (
+              <div className="mt-3 sm:mt-4">
+                <FlightToolbar
+                  flights={flights}
+                  flightResults={flightResults}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  filteredCount={filtered.length}
+                />
+              </div>
+            );
+          })()}
+        </div>
 
-        <div className="mt-4 sm:mt-8">
+        <div className="mt-1 sm:mt-2">
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
@@ -186,13 +212,6 @@ export default function Home() {
             const filtered = filterFlights(flights, searchQuery);
             return (
               <div className="flex flex-col gap-4 sm:gap-6">
-                <FlightToolbar
-                  flights={flights}
-                  flightResults={flightResults}
-                  searchQuery={searchQuery}
-                  onSearchChange={setSearchQuery}
-                  filteredCount={filtered.length}
-                />
                 {filtered.length === 0 ? (
                   <div className="flex flex-col items-center py-16 text-center">
                     <p className="text-sm text-muted">No watches match &ldquo;{searchQuery}&rdquo;</p>
