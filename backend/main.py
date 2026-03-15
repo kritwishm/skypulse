@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+import re
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Query, WebSocket
@@ -9,6 +11,24 @@ from database import init_db
 from routers.auth import router as auth_router
 from routers.flights import router as flights_router
 from ws_handler import websocket_handler
+
+
+# Redact JWT tokens from all logs
+class _TokenRedactFilter(logging.Filter):
+    _pattern = re.compile(r"(token=)[^\s&\"']+")
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        record.msg = self._pattern.sub(r"\1[REDACTED]", str(record.msg))
+        if record.args:
+            record.args = tuple(
+                self._pattern.sub(r"\1[REDACTED]", str(a)) if isinstance(a, str) else a
+                for a in (record.args if isinstance(record.args, tuple) else (record.args,))
+            )
+        return True
+
+
+for _logger_name in ("uvicorn", "uvicorn.access", "uvicorn.error"):
+    logging.getLogger(_logger_name).addFilter(_TokenRedactFilter())
 
 
 @asynccontextmanager
