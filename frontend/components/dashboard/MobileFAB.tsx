@@ -64,57 +64,57 @@ export default function MobileFAB({
               onClick={close}
             />
 
-            {/* Timer picker — appears to the left */}
-            <AnimatePresence>
-              {showTimerPicker && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9, x: 8 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, x: 8 }}
-                  className="absolute bottom-[8.5rem] right-14 rounded-xl border border-slate-700/50 bg-[#131b2e] p-1 shadow-xl shadow-black/40"
-                >
-                  <div className="flex gap-0.5">
-                    {INTERVALS.map((val) => (
-                      <button
-                        key={val}
-                        onClick={() => {
-                          onSetRefreshInterval(val);
-                          setShowTimerPicker(false);
-                        }}
-                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
-                          refreshInterval === val
-                            ? "bg-blue-500/20 text-blue-300"
-                            : "text-slate-400 active:bg-slate-800"
-                        }`}
-                      >
-                        {val === 0 ? "Off" : `${val}m`}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Action buttons */}
             <div className="absolute bottom-14 right-0 flex flex-col items-end gap-2">
               {/* Auto-refresh */}
-              <motion.button
-                custom={2}
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                whileTap={{ scale: 0.92 }}
-                onClick={() => setShowTimerPicker((p) => !p)}
-                className={`flex items-center gap-1.5 h-10 pl-3 pr-3.5 rounded-full shadow-lg shadow-black/30 border text-xs font-medium ${
-                  isAutoRefreshOn
-                    ? "bg-blue-500/15 border-blue-500/30 text-blue-400"
-                    : "bg-[#1a2540] border-slate-700/50 text-slate-400"
-                }`}
-              >
-                <Timer className="h-3.5 w-3.5" />
-                {isAutoRefreshOn ? formatCountdown(refreshSecondsLeft) : "Auto"}
-              </motion.button>
+              <div className="relative">
+                <AnimatePresence>
+                  {showTimerPicker && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9, x: 8 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, x: 8 }}
+                      className="absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded-xl border border-slate-700/50 bg-[#131b2e] p-1 shadow-xl shadow-black/40"
+                    >
+                      <div className="flex gap-0.5">
+                        {INTERVALS.map((val) => (
+                          <button
+                            key={val}
+                            onClick={() => {
+                              onSetRefreshInterval(val);
+                              setShowTimerPicker(false);
+                            }}
+                            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                              refreshInterval === val
+                                ? "bg-blue-500/20 text-blue-300"
+                                : "text-slate-400 active:bg-slate-800"
+                            }`}
+                          >
+                            {val === 0 ? "Off" : `${val}m`}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <motion.button
+                  custom={2}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => setShowTimerPicker((p) => !p)}
+                  className={`flex items-center gap-1.5 h-10 pl-3 pr-3.5 rounded-full shadow-lg shadow-black/30 border text-xs font-medium ${
+                    isAutoRefreshOn
+                      ? "bg-blue-500/15 border-blue-500/30 text-blue-400"
+                      : "bg-[#1a2540] border-slate-700/50 text-slate-400"
+                  }`}
+                >
+                  <Timer className="h-3.5 w-3.5" />
+                  {isAutoRefreshOn ? formatCountdown(refreshSecondsLeft) : "Auto"}
+                </motion.button>
+              </div>
 
               {/* Check All */}
               <motion.button
