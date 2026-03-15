@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, RefreshCw, Timer, X } from "lucide-react";
+import { Plus, RefreshCw, Timer, X, LogOut } from "lucide-react";
 import type { RefreshInterval } from "@/hooks/useAutoRefresh";
 
 interface MobileFABProps {
@@ -14,6 +14,8 @@ interface MobileFABProps {
   refreshInterval: RefreshInterval;
   onSetRefreshInterval: (mins: RefreshInterval) => void;
   refreshSecondsLeft: number;
+  username?: string;
+  onLogout?: () => void;
 }
 
 const INTERVALS: RefreshInterval[] = [0, 1, 5, 10, 15, 30];
@@ -43,6 +45,8 @@ export default function MobileFAB({
   refreshInterval,
   onSetRefreshInterval,
   refreshSecondsLeft,
+  username,
+  onLogout,
 }: MobileFABProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showTimerPicker, setShowTimerPicker] = useState(false);
@@ -132,7 +136,7 @@ export default function MobileFAB({
                            disabled:opacity-40"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${isChecking ? "animate-spin" : ""}`} />
-                Check
+                Refresh
                 {flightCount > 0 && (
                   <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-500/20 px-1 text-[10px] text-blue-400">
                     {flightCount}

@@ -59,14 +59,34 @@ export default function DashboardHeader({
         <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">
           SkyPulse
         </h1>
-        {/* Mobile connection dot — inline with title */}
-        <div className="flex sm:hidden items-center gap-1.5">
-          <PulsingDot color={isConnected ? "green" : "red"} size="sm" />
-          <span className="text-[11px] text-slate-500">
-            {isConnected ? "Live" : "Offline"}
-          </span>
+        {/* Mobile: connection dot + countdown */}
+        <div className="flex sm:hidden items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <PulsingDot color={isConnected ? "green" : "red"} size="sm" />
+            <span className="text-[11px] text-slate-500">
+              {isConnected ? "Live" : "Offline"}
+            </span>
+          </div>
+          {isAutoRefreshOn && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[11px] font-medium text-blue-400 tabular-nums">
+              <Timer className="h-2.5 w-2.5" />
+              {formatCountdown(refreshSecondsLeft)}
+            </span>
+          )}
         </div>
       </div>
+
+      {/* Mobile: logout button (top right) */}
+      {onLogout && (
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={onLogout}
+          className="flex sm:hidden items-center gap-1.5 p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+          title="Logout"
+        >
+          <LogOut className="h-4 w-4" />
+        </motion.button>
+      )}
 
       {/* Desktop controls — hidden on mobile (FAB handles it) */}
       <div className="hidden sm:flex items-center gap-2">
@@ -154,8 +174,8 @@ export default function DashboardHeader({
           <RefreshCw
             className={`h-3 w-3 sm:h-4 sm:w-4 ${isChecking ? "animate-spin" : ""}`}
           />
-          <span className="hidden xs:inline">Check All</span>
-          <span className="xs:hidden">Check</span>
+          <span className="hidden xs:inline">Refresh All</span>
+          <span className="xs:hidden">Refresh</span>
           {flightCount > 0 && (
             <span className="flex h-4 min-w-4 sm:h-5 sm:min-w-5 items-center justify-center rounded-full bg-blue-500/15 px-1 sm:px-1.5 text-[10px] sm:text-xs text-blue-400 font-medium">
               {flightCount}

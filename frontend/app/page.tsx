@@ -235,6 +235,8 @@ export default function Home() {
         refreshInterval={refreshInterval}
         onSetRefreshInterval={setRefreshInterval}
         refreshSecondsLeft={refreshSecondsLeft}
+        username={user?.username}
+        onLogout={logout}
       />
     </div>
   );
