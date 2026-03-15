@@ -85,7 +85,7 @@ export default function Home() {
             message: msg.message,
             cheapest_price: msg.cheapest_price,
             max_price: msg.max_price,
-            cheapest_date: flightResults[msg.id]?.cheapest_date ?? null,
+            cheapest_date: msg.cheapest_date ?? null,
           });
           break;
 

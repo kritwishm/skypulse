@@ -89,6 +89,7 @@ export type WSIncoming =
       id: string;
       cheapest_price: number;
       max_price: number;
+      cheapest_date: string | null;
       message: string;
     }
   | { type: "check_all_complete"; count: number }

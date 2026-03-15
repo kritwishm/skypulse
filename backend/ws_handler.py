@@ -92,6 +92,7 @@ async def _check_single_flight(ws: WebSocket, flight_id: str, user_id: str) -> N
                     "id": flight_id,
                     "cheapest_price": result.cheapest_price,
                     "max_price": refreshed.max_price,
+                    "cheapest_date": result.cheapest_date,
                     "message": (
                         f"Deal found! {refreshed.origin} -> {refreshed.destination} "
                         f"at {result.cheapest_price} (target: {refreshed.max_price})"
