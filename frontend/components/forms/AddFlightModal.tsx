@@ -24,6 +24,15 @@ const STOP_OPTIONS = [
 const inputClasses =
   "rounded-lg border border-input bg-input px-3 py-2.5 text-primary placeholder-[var(--text-muted)] outline-none transition-colors focus:border-blue-500/40 focus:bg-[var(--bg-elevated)] focus:ring-1 focus:ring-blue-500/20";
 
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function clampDate(value: string, min?: string): string {
+  if (min && value < min) return min;
+  return value;
+}
+
 const initialState: FlightWatchCreate = {
   origin: "",
   destination: "",
@@ -80,6 +89,7 @@ export default function AddFlightModal({
 
       if (form.origin.length !== 3 || form.destination.length !== 3) return;
       if (!form.departure_date) return;
+      if (!isEditing && form.departure_date < today()) return;
       if (form.trip_type === "round-trip" && !form.return_date) return;
 
       const payload: FlightWatchCreate = {
@@ -178,9 +188,20 @@ export default function AddFlightModal({
               <input
                 type="date"
                 value={form.departure_date}
-                onChange={(e) => update("departure_date", e.target.value)}
+                onChange={(e) => {
+                  const val = clampDate(e.target.value, today());
+                  update("departure_date", val);
+                  // Clear downstream dates if they're now before this date
+                  if (form.departure_date_end && form.departure_date_end < val) {
+                    update("departure_date_end", undefined);
+                  }
+                  if (form.return_date && form.return_date < val) {
+                    update("return_date", undefined);
+                    update("return_date_end", undefined);
+                  }
+                }}
                 required
-                min={new Date().toISOString().split("T")[0]}
+                min={today()}
                 className={inputClasses}
               />
             </div>
@@ -189,7 +210,11 @@ export default function AddFlightModal({
               <input
                 type="date"
                 value={form.departure_date_end ?? ""}
-                onChange={(e) => update("departure_date_end", e.target.value || undefined)}
+                onChange={(e) => {
+                  const min = form.departure_date || today();
+                  const val = e.target.value ? clampDate(e.target.value, min) : undefined;
+                  update("departure_date_end", val);
+                }}
                 disabled={!form.departure_date}
                 min={form.departure_date || undefined}
                 max={form.departure_date ? new Date(new Date(form.departure_date).getTime() + 15 * 86400000).toISOString().split("T")[0] : undefined}
@@ -238,7 +263,14 @@ export default function AddFlightModal({
                 <input
                   type="date"
                   value={form.return_date ?? ""}
-                  onChange={(e) => update("return_date", e.target.value)}
+                  onChange={(e) => {
+                    const min = form.departure_date_end || form.departure_date || today();
+                    const val = clampDate(e.target.value, min);
+                    update("return_date", val);
+                    if (form.return_date_end && form.return_date_end < val) {
+                      update("return_date_end", undefined);
+                    }
+                  }}
                   required
                   min={form.departure_date_end || form.departure_date || undefined}
                   className={inputClasses}
@@ -249,7 +281,11 @@ export default function AddFlightModal({
                 <input
                   type="date"
                   value={form.return_date_end ?? ""}
-                  onChange={(e) => update("return_date_end", e.target.value || undefined)}
+                  onChange={(e) => {
+                    const min = form.return_date || today();
+                    const val = e.target.value ? clampDate(e.target.value, min) : undefined;
+                    update("return_date_end", val);
+                  }}
                   disabled={!form.return_date}
                   min={form.return_date || undefined}
                   max={form.return_date ? new Date(new Date(form.return_date).getTime() + 15 * 86400000).toISOString().split("T")[0] : undefined}
