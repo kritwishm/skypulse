@@ -9,6 +9,7 @@ import FlightGrid from "@/components/dashboard/FlightGrid";
 import FlightCard from "@/components/dashboard/FlightCard";
 import FlightCardExpanded from "@/components/dashboard/FlightCardExpanded";
 import EmptyState from "@/components/dashboard/EmptyState";
+import FlightToolbar, { filterFlights } from "@/components/dashboard/FlightToolbar";
 import AddFlightModal from "@/components/forms/AddFlightModal";
 import DealAlert from "@/components/alerts/DealAlert";
 import MobileFAB from "@/components/dashboard/MobileFAB";
@@ -40,6 +41,7 @@ export default function Home() {
   const [flightResults, setFlightResults] = useState<Record<string, FlightCheckResult>>({});
   const [checkingIds, setCheckingIds] = useState<Set<string>>(new Set());
   const [isCheckingAll, setIsCheckingAll] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { showAlert, alertData, triggerAlert, dismissAlert } = useDealAlert();
 
@@ -180,22 +182,46 @@ export default function Home() {
             </div>
           ) : !flights?.length ? (
             <EmptyState onAddFlight={() => setIsAddModalOpen(true)} />
-          ) : (
-            <FlightGrid>
-              {flights.map((flight) => (
-                <FlightCard
-                  key={flight.id}
-                  flight={flight}
-                  result={flightResults[flight.id] || null}
-                  isChecking={checkingIds.has(flight.id)}
-                  onCheck={() => handleCheckOne(flight.id)}
-                  onDelete={() => handleDeleteFlight(flight.id)}
-                  onEdit={() => handleEditFlight(flight)}
-                  onExpand={() => setExpandedFlightId(flight.id)}
+          ) : (() => {
+            const filtered = filterFlights(flights, searchQuery);
+            return (
+              <div className="flex flex-col gap-4 sm:gap-6">
+                <FlightToolbar
+                  flights={flights}
+                  flightResults={flightResults}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  filteredCount={filtered.length}
                 />
-              ))}
-            </FlightGrid>
-          )}
+                {filtered.length === 0 ? (
+                  <div className="flex flex-col items-center py-16 text-center">
+                    <p className="text-sm text-muted">No watches match &ldquo;{searchQuery}&rdquo;</p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  <FlightGrid>
+                    {filtered.map((flight) => (
+                      <FlightCard
+                        key={flight.id}
+                        flight={flight}
+                        result={flightResults[flight.id] || null}
+                        isChecking={checkingIds.has(flight.id)}
+                        onCheck={() => handleCheckOne(flight.id)}
+                        onDelete={() => handleDeleteFlight(flight.id)}
+                        onEdit={() => handleEditFlight(flight)}
+                        onExpand={() => setExpandedFlightId(flight.id)}
+                      />
+                    ))}
+                  </FlightGrid>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
