@@ -260,6 +260,11 @@ export default function FlightCard({
                 {formatPrice(flight.cheapest_price, flight.currency)}
               </span>
               <p className="text-[11px] sm:text-xs text-muted mt-1">Last known price</p>
+              {flight.cheapest_date && flight.departure_date_end && (
+                <p className="text-[11px] sm:text-xs text-[var(--accent)] mt-1">
+                  Best on {formatDate(flight.cheapest_date)}
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center gap-1 py-2 sm:py-3">
